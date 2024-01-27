@@ -1,3 +1,5 @@
+import random
+import time
 import tkinter as tk
 from tkinter import messagebox
 
@@ -11,30 +13,32 @@ root.geometry("500x400+720+200")
 root.title('Tic Tac Toe')
 
 # function to initiate on click
-def on_click(row, col):
+def player_moves(row, col):
     global player, board
 
     # updating the board and buttons
-    if board[row][col] == '':
-        board[row][col] = player
-        update_buttons(row ,col)
+    # if board[row][col] == '':
+    board[row][col] = player
+    update_buttons(row ,col)
 
-        # checking if the game is won or tied and then resetting the game
-        if main_game_logic():
-            messagebox.showinfo('Game Over', f'Congratulations Player {player}! You won.')
-            reset()
-        elif no_more_moves():
-            messagebox.showinfo('Game Over', 'No more moves possible, the game is tied.')
-            reset()
-        else:
-            switch()
+    # checking if the game is won or tied and then resetting the game
+    if main_game_logic():
+        messagebox.showinfo('Game Over', f'Congratulations Player {player}! You won.')
+        reset()
+    elif no_more_moves():
+        messagebox.showinfo('Game Over', 'No more moves possible, the game is tied.')
+        reset()
+    else:
+        switch()
+        # once the player == 'O', exceuted after a delay
+        root.after(1000, computer)
 
 # updating buttons with 'X' or 'O'
 def update_buttons(row, col):
     button = buttons[row][col]
     button.config(text=player, state=tk.DISABLED)
 
-# game won
+# game logic of winning
 def main_game_logic():
     for i in range(3):
         if board[i][0] == board[i][1] == board[i][2] != "":
@@ -66,8 +70,27 @@ def reset():
     global player
     player = 'X'
 
+# basic computer player
+def computer():
+    # randomly selecting move
+    possible_moves = [(i,j) for j in range(3) for i in range(3) if board[i][j] == '']
+    row, col = random.choice(possible_moves)
+    # time.sleep(3)
+    board[row][col] = player
+    update_buttons(row, col)
+
+    # checking if the game is won or tied and then resetting the game
+    if main_game_logic():
+        messagebox.showinfo('Game Over', f'Congratulations Player {player}! You won.')
+        reset()
+    elif no_more_moves():
+        messagebox.showinfo('Game Over', 'No more moves possible, the game is tied.')
+        reset()
+    else:
+        switch()
+
 # 3*3 buttons
-buttons = [[tk.Button(root, text='', font=('Helvetica, 16'), width=5, height=2, command=lambda row=i, col=j: on_click(row, col)) for j in range((3))] for i in range(3)]
+buttons = [[tk.Button(root, text='', font=('Helvetica, 16'), width=5, height=2, command=lambda row=i, col=j: player_moves(row, col)) for j in range((3))] for i in range(3)]
 
 # creating 3*3 grid
 for i in range(3):
